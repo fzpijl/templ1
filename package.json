@@ -5,19 +5,22 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "node ./scripts/dev.js",
-    "push": "node ./scripts/push.js"
+    "dev": "webpack --config config/webpack.dev.js",
+    "build": "webpack --config config/webpack.prod.js",
+    "push": "node scripts/push.js"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@vercel/ncc": "^0.24.0",
     "chalk": "^4.1.0",
+    "clean-webpack-plugin": "^3.0.0",
     "copy-webpack-plugin": "^6.1.0",
+    "eslint": "^7.9.0",
+    "eslint-loader": "^4.0.2",
     "file-loader": "^6.1.0",
+    "friendly-errors-webpack-plugin": "^1.7.0",
     "fs-extra": "^9.0.1",
     "glob": "^7.1.6",
-    "ncc": "^0.3.6",
     "terser-webpack-plugin": "^4.1.0",
     "url-loader": "^4.1.0",
     "webpack": "^4.44.1",

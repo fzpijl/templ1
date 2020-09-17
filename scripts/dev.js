@@ -1,13 +1,11 @@
 const webpack = require('webpack')
 const paths = require('./paths')
-let config = require('../webpack.config')
-config.mode = 'development'
+let config = require('../config/webpack.dev')
+const chalk = require('chalk')
 
-console.log(process.argv)
-
-if (!paths.checkRequiredPath([paths.appXml, paths.appIndex])) {
-    process.exit(1)
-}
+// if (!paths.checkRequiredPath([paths.appXml, paths.appIndex])) {
+//     process.exit(1)
+// }
 
 function build() {
 
@@ -40,6 +38,8 @@ function build() {
                     stats.toJson({ all: false, warnings: true, errors: true })
                 );
             }
+
+
             if (messages.errors.length) {
                 // Only keep the first error. Others are often indicative
                 // of the same problem, but confuse the reader with noise.
@@ -71,5 +71,31 @@ function build() {
     });
 }
 
-webpack(config, (err, stats) => {})
+// webpack(config, (err, stats) => {
+//     console.log('...................................................................ddddddddddddd')
+//     // console.log(err)
+//     // console.log(stats.hasErrors())
+//     // if (stats.hasErrors()) {
+//     //    let s =  stats.toJson({ all: false, warnings: true, errors: true })
+//     //    console.log(s)
+//     // }
+// })
+
+
+
+build = function () {
+    let compiler = webpack(config)
+    return new Promise((resolve, reject) => {
+        compiler.run((err, stats) => {
+            if (err) {
+                reject(err)
+            } else {
+                resolve(stats)
+            }
+        })
+    })
+}
+build()
+
+
 

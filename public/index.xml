@@ -1,1 +1,20 @@
-<html>1.参考微信小程序， 试试import的路径</html>
+<Window id='w1' type="3d" position="[0, 0, -10]" size="[10, 10, 10]">
+    <PointLight color="[0.5,0.5,0.5]" intensity="2" distance="15" position="[0,0,0]"/>
+    <Container id="root">
+        <Container id="green world" position="[0,-5,0]">
+            <Primitive geometry="plane" scale="[10,10,1]" euler="[-90,0,0]" color="[0,1,0]" />
+            <Primitive geometry="cube" position="[-3,0.5,-3]" scale="[1,1,1]" euler="[0,30,0]" color="[0,1,0]" />
+            <Primitive geometry="cube" position="[-3,0.5,3]" scale="[1,1,1]" euler="[0,45,0]" color="[0,1,0]" />
+            <Primitive geometry="cube" position="[3,0.5,-3]" scale="[1,1,1]" euler="[0,60,0]" color="[0,1,0]" />
+            <Primitive geometry="cube" position="[3,0.5,3]" scale="[1,1,1]" euler="[0,75,0]" color="[0,1,0]" />
+        </Container>
+        <Container id="yellow world" position="[0,-5,0]">
+            <Primitive geometry="plane" scale="[10,10,1]" euler="[-90,0,0]" color="[1,1,0]" />
+            <Primitive geometry="sphere" position="[-3,0.5,0]" scale="[1,1,1]" color="[1,1,0]" />
+            <Primitive geometry="sphere" position="[3,0.5,0]" scale="[1,1,1]" color="[1,1,0]" />
+            <Primitive geometry="sphere" position="[0,0.5,-3]" scale="[1,1,1]" color="[1,1,0]" />
+            <Primitive geometry="sphere" position="[0,0.5,3]" scale="[1,1,1]" color="[1,1,0]" />
+        </Container>
+    </Container>
+    <Portal id="portal" scale="[2,4,1]" position="[0,-3,0]" />
+</Window>

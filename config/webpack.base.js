@@ -1,58 +1,111 @@
 const fs = require('fs');
 const path = require('path');
+const CopyPlugin = require('copy-webpack-plugin')
+const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
 
-const paths = require('./paths');
+// Check if ESLint is setup
+let eslintExts = ['js', 'json', 'yml']
+const useESLint = eslintExts.some(ext => fs.existsSync(path.resolve(__dirname, '..', `.eslintrc.${ext}`)))
 
-// Check if TypeScript is setup
-const useTypeScript = fs.existsSync(paths.appTsConfig);
-const useESLint = fs.existsSync(path.resolve(__dirname), '..', '.eslintrc.js')
-
-module.exports = function (webpackEnv) {
-  const isEnvProduction = webpackEnv === 'production';
-
-  return {
-    entry: 'index.js',
-    output: {
-      path: path.resolve(__dirname, '..', 'dist'),
-      filename: 'index.js'
-    },
-    resolve: {
-      extensions: paths.moduleFileExtensions
-        .map(ext => `.${ext}`)
-        .filter(ext => useTypeScript || !ext.includes('ts')),
-    },
-    module: {
-      rules: [
-        // Disable require.ensure as it's not a standard language feature.
-        { parser: { requireEnsure: false } },
-        {
-          test: /\.(js|mjs|ts)$/,
-          enforce: 'pre',
-          use: [
-            {
-              options: {
-                cache: true,
-                eslintPath: require.resolve('eslint'),
-              },
-              loader: require.resolve('eslint-loader'),
-            },
-          ],
-        }, {
-          test: /\.(js|mjs|ts)$/,
-          exculde: /node_modules/,
-          loader: 'babel-loader',
-          options: {
-            cacheDirectory: true,
-            // See #6846 for context on why cacheCompression is disabled
-            cacheCompression: false
+let config = {
+  entry: './src/index.js',
+  output: {
+    path: path.resolve(__dirname, '..', 'dist'),
+    filename: 'index.js'
+  },
+  externals: {
+    XRWeb: 'commonjs XRWeb'
+  },
+  target: 'node',
+  node: false,
+  module: {
+    rules: [
+      useESLint ? {
+        test: /\.(js|mjs)$/,
+        enforce: 'pre',
+        use: [
+          {
+            loader: 'eslint-loader',
+            options: {
+              cache: true,
+              eslintPath: require.resolve('eslint'),
+            }
+          },
+        ],
+        include: path.resolve(__dirname, 'src'),
+        exclude: /node_modules/
+      } : undefined,
+      {
+        test: /\.(js|mjs)$/i,
+        include: path.resolve(__dirname, 'src'),
+        exclude: /node_modules/,
+        loader: 'babel-loader',
+        options: {
+          cacheDirectory: true,
+          // See #6846 for context on why cacheCompression is disabled
+          cacheCompression: false
+        }
+      },
+      {
+        test: /\.(png|jpe?g|gif|webp|svg)$/i,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              esModule: false,
+              name: 'images/[name].[ext]'
+            }
           }
+        ],
+        include: path.resolve(__dirname, 'src'),
+        exclude: /node_modules/
+      },
+      {
+        test: /\.(fbx|obj|mtl)$/i,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              esModule: false,
+              name: (resourcePath, resourceQuery) => {
+                let prefix = 'models'
+                let resourceDir = path.dirname(resourcePath)
+                let dirname = resourceDir.split(path.sep).pop() || ''
+                let basename = path.basename(resourcePath)
+                let resourceDest = path.join(config.output.path, prefix, dirname)
+                fs.copySync(resourceDir, resourceDest, {
+                  overwrite: true,
+                  errorOnExist: true,
+                  filter: (a) => {
+                    return path.basename(a) !== basename
+                  }
+                })
+                return `${prefix}/${dirname}/[name].[ext]`
+              }
+            }
+          }
+        ]
+      }
+
+    ].filter(Boolean),
+  },
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        {
+          from: path.resolve(__dirname, '../public')
         },
-      ],
-    },
-    externals: {
-      XRWeb: 'commonjs XRWeb'
-    },
-    target: 'node',
-    node: false
-  };
-};
+        {
+          from: path.resolve(__dirname, '../XRManifest.xml')
+        }
+      ]
+    }),
+    new CleanWebpackPlugin(),
+    new FriendlyErrorsPlugin()
+  ],
+  stats: 'errors-only'
+}
+
+
+module.exports = config
