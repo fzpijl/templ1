@@ -7,12 +7,12 @@
 // console.log(a)
 
 const { app } = require('XRWeb');
-// const image = require('./components/image')
-// const model = require('./components/model')
+const image = require('./components/image')
+const model = require('./components/model')
 
 let w = app.getWindowById('w1');
-// w.appendChild(image)
-// w.appendChild(model)
+w.appendChild(image)
+w.appendChild(model)
 
 // 设置 Location Changed Callback
 w.on('destroy', () => {

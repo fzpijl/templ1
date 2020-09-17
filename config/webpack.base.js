@@ -1,4 +1,4 @@
-const fs = require('fs');
+const fs = require('fs-extra');
 const path = require('path');
 const CopyPlugin = require('copy-webpack-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
@@ -33,12 +33,12 @@ let config = {
             }
           },
         ],
-        include: path.resolve(__dirname, 'src'),
+        include: path.resolve(__dirname, '../src'),
         exclude: /node_modules/
       } : undefined,
       {
         test: /\.(js|mjs)$/i,
-        include: path.resolve(__dirname, 'src'),
+        include: path.resolve(__dirname, '../src'),
         exclude: /node_modules/,
         loader: 'babel-loader',
         options: {
@@ -58,7 +58,7 @@ let config = {
             }
           }
         ],
-        include: path.resolve(__dirname, 'src'),
+        include: path.resolve(__dirname, '../src'),
         exclude: /node_modules/
       },
       {
@@ -91,6 +91,7 @@ let config = {
     ].filter(Boolean),
   },
   plugins: [
+   
     new CopyPlugin({
       patterns: [
         {
@@ -101,7 +102,10 @@ let config = {
         }
       ]
     }),
-    new CleanWebpackPlugin(),
+    //会清空之前复制到输出目录中的.mtl文件
+    // new CleanWebpackPlugin({
+    //   verbose: true
+    // }),
     new FriendlyErrorsPlugin()
   ],
   stats: 'errors-only'
